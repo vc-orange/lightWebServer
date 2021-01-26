@@ -1,10 +1,13 @@
 #include "lwsEventLoop.h"
+#include "lwsPoller.h"
+
+const int k_poll_time_ms = 10000;
 
 thread_local lws_event_loop *lws_event_loop::event_loop_singleton = nullptr;
 
 /*
 lws_log & operator<<(lws_log& log,const lws_event_loop loop){
-    return log<<loop.threadId<<'\n';
+    return log<<loop.__threadId<<'\n';
 }
 */
 
@@ -14,15 +17,16 @@ lws_event_loop *lws_event_loop::get_event_loop_singleton()
 }
 
 lws_event_loop::lws_event_loop()
-    : looping(false),
-      threadId(std::this_thread::get_id())
+    : __looping(false),
+      __threadId(std::this_thread::get_id()),
+      __poller(new lws_poller(this))
 {
-    LOG_TRACE << "event_loop created " << this << "in threadId " << threadId << '\n';
+    LOG_TRACE << "event_loop created " << this << " in __threadId " << __threadId << '\n';
     if (event_loop_singleton)
     {
         LOG_FATAL << "Warning!!: "
                   << "another event_loop " << event_loop_singleton
-                  << " has created in this thread: " << threadId << '\n';
+                  << " has created in this thread: " << __threadId << '\n';
         abort();
     }
     else
@@ -31,9 +35,16 @@ lws_event_loop::lws_event_loop()
     }
 }
 
+
+void lws_event_loop::update_channel(lws_channel *channel)
+{
+    assert(channel->owner_loop()==this);
+    assert_in_loop_thread();
+    __poller->update_channel(channel);
+}
 lws_event_loop::~lws_event_loop()
 {
-    assert(!looping);
+    assert(!__looping);
     event_loop_singleton = nullptr;
 }
 
@@ -45,7 +56,7 @@ void lws_event_loop::assert_in_loop_thread()
 
 bool lws_event_loop::in_loop_thread()
 {
-    return threadId == std::this_thread::get_id();
+    return __threadId == std::this_thread::get_id();
 }
 
 void lws_event_loop::abort_not_in_loop_thread()
@@ -56,12 +67,25 @@ void lws_event_loop::abort_not_in_loop_thread()
 
 void lws_event_loop::loop()
 {
-    assert(!looping);
+    assert(!__looping);
     assert_in_loop_thread();
-    looping = true;
+    __looping = true;
+    __quit = false;
 
-    sleep(5);
+    while (!__quit)
+    {
+        __active_channels.clear();
+        __poller->lws_poll(k_poll_time_ms, &__active_channels);
+        for (auto &channel_ptr : __active_channels)
+        {
+            channel_ptr->handle_event();
+        }
+    }
 
-    LOG_TRACE << "event loop " << this << " stop looping \n";
-    looping = false;
+    LOG_TRACE << "event loop " << this << " stop __looping \n";
+    __looping = false;
+}
+
+void lws_event_loop::quit(){
+    __quit=true;
 }

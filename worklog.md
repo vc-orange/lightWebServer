@@ -3,3 +3,8 @@
 添加了lws_task类，继承这个类的成员都可以调用线程池
 #
 增加了lws_event_loop 雏形，实现了每个线程最多创建一个，支持检测当前线程与lws_event_loop是否匹配的功能
+#
+完善了lwn_event_loop类
+增加了lws_poller类，主要用于在eventloop中监听处理所有的fd，并把监听到的fd对应的channel组成activelist 返回给当前的loop
+增加了lws_channel类，channel是对外的一个接口，channel需要初始化它要监听的对象、以及它在哪一个LOOP里面，然后再初始化channel对应的回调函数，就能实现自动处理。
+一个event并不直接拥有channel，而是通过event下的poller中的channelmap间接拥有，event只负责在发生事件后，对poller返回的活动队列依次调用回调函数。

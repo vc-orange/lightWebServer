@@ -1,19 +1,31 @@
-objects = ./test/LELtest01.o lwsEventLoop.o 
+TEST = ./test/lwsTest02.cpp
 
-buildv1 : $(objects)
-	g++ -o TEST.o $(objects) -lpthread
+LIB_SRC = lwsChannel.o lwsEventLoop.o LwsPoller.o 
+LIB_H = lwsChannel.h lwsEventLoop.h lwsLog.h
+CXXFALGS = -O0 -g -Wall  -I -pthread
+LDFLAGS = -lpthread
 
-./test/LELtest01.o : ./test/LELtest01.cpp lwsEventLoop.h
-	g++ -g -c ./test/LELtest01.cpp -o ./test/LELtest01.o 
+get: target
 
-lwsEventLoop.o : lwsEventLoop.cpp lwsEventLoop.h
-	g++ -g -c lwsEventLoop.cpp	 
-lwslog.o : lwslog.h lwslog.cpp
-	g++ -g -c lwslog.cpp
+target: $(TEST) $(LIB_SRC)
+	g++  $(CXXFALGS) -o TEST.o $(TEST) $(LIB_SRC) $(LDFLAGS)
 
-/test/threadPoolTest.o : ./test/threadPoolTest.cpp lwsThreadPool.h
-	g++ -g -c ./test/threadPoolTest.cpp
-lwsThreadPool.o :  lwsThreadPool.h lwsThreadPool.cpp
-	g++ -g -c lwsThreadPool.cpp
+
+lwsChannel.o:lwsChannel.cpp $(LIB_H)
+	g++ -g -c lwsChannel.cpp -o lwsChannel.o
+
+lwsEventLoop.o:lwsEventLoop.cpp $(LIB_H)
+	g++ -g -c lwsEventLoop.cpp -o lwsEventLoop.o
+
+LwsPoller.o :lwsPoller.cpp $(LIB_H)
+	g++ -g -c LwsPoller.cpp -o LwsPoller.o 
+
+
+
+
+
 clean:
-	-rm TEST.o $(objects)
+	-rm  *.o
+
+
+

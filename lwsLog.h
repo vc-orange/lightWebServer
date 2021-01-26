@@ -7,12 +7,12 @@
 
 #ifdef LOG_NOT_READY
 #include<iostream>
-#define LOG_TRACE std::cout
-#define LOG_DEBUG std::cout
-#define LOG_INFO std::cout
-#define LOG_WARN std::cout
-#define LOG_ERROR std::cout
-#define LOG_FATAL std::cout
+#define LOG_TRACE std::cout << "TRACE: "
+#define LOG_DEBUG std::cout << "DEBUG: "
+#define LOG_INFO std::cout << "INFO: "
+#define LOG_WARN std::cout << "WARN: "
+#define LOG_ERROR std::cout << "ERROR: "
+#define LOG_FATAL std::cout << "FATAL: "
 #else
 #define LOG_TRACE lws_log::lws_log_stream
 #define LOG_DEBUG lws_log::lws_log_stream
