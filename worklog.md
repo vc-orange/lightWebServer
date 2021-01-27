@@ -8,3 +8,12 @@
 增加了lws_poller类，主要用于在eventloop中监听处理所有的fd，并把监听到的fd对应的channel组成activelist 返回给当前的loop
 增加了lws_channel类，channel是对外的一个接口，channel需要初始化它要监听的对象、以及它在哪一个LOOP里面，然后再初始化channel对应的回调函数，就能实现自动处理。
 一个event并不直接拥有channel，而是通过event下的poller中的channelmap间接拥有，event只负责在发生事件后，对poller返回的活动队列依次调用回调函数。
+#
+增加了lws_timer_queue类，主要用于在eventloop中提供定时功能。该类保存着一个以 时间和timer指针 为键值timer set，可以快速查找到时间已经到的timer对象，并把依次调用其回调函数。
+增加了lws_timer类，主要属性包括回调函数，触发时间以及是否循环执行。
+增加了lws_time_stamp类，这个类主要是对系统调用的timeval进行了包装，从结构体转为了定长的大数，可以实现时间的加减和比较。
+
+eventloop拥有一个lws_timer_queue的指针，并在初始化时初始一个实体对象。
+每次调用eventloop的run_at功能会转为在lws_timer_queue中增加一个timer事件
+lws_timer_queue会在当前I/Oloop中注册一个channel，使得eventloop可以沿着lws_event_loop-->poll-->active_channel-->lws_channel-->lws_timer_queue-->timer-->call_back，以此来完成定时的callback任务。
+

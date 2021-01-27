@@ -15,8 +15,8 @@ lws_poller::~lws_poller()
 {
 }
 
-//待修改，暂不返回时间戳
-void lws_poller::lws_poll(int timeoutMs, channel_list *active_channels)
+//
+lws_time_stamp lws_poller::lws_poll(int timeoutMs, channel_list *active_channels)
 {
     int num_events = poll(__pollfds.data(), __pollfds.size(), timeoutMs);
     //Timestamp now(Timestamp::now());
@@ -33,7 +33,7 @@ void lws_poller::lws_poll(int timeoutMs, channel_list *active_channels)
     {
         LOG_ERROR << "lws_poll::lws_poll()\n";
     }
-    //return now;
+    return lws_time_stamp::now();
 }
 
 //接收一个fd，从channel map里找到对应fd的channel，挂到活动队列上
@@ -61,7 +61,7 @@ void lws_poller::fill_active_channels(int num_events,
 void lws_poller::update_channel(lws_channel *channel)
 {
     assert_in_loop_thread();
-    LOG_TRACE << "fd= " << channel->fd()
+    LOG_TRACE << "poller--fd= " << channel->fd()
               << " events= " << channel->events()<< '\n';
     if (channel->index() < 0)
     {

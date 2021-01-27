@@ -3,9 +3,7 @@
 
 #include <vector>
 #include <map>
-//#include "datetime/Timestamp.h"
-//using muduo::Timestamp;
-
+#include "lwsTimeStamp.h"
 struct pollfd;
 class lws_channel;
 class lws_event_loop;
@@ -19,7 +17,7 @@ public:
     ~lws_poller();
 
     //poll I/O事件
-    void lws_poll(int timeoutMs, channel_list *active_channels);
+    lws_time_stamp lws_poll(int timeoutMs, channel_list *active_channels);
 
     void update_channel(lws_channel *channel);
 

@@ -10,11 +10,12 @@
 #include <vector>
 #include "lwsLog.h"
 #include "lwsChannel.h"
-
-
+#include "lwsTimeStamp.h"
+#include "lwsTimerId.h"
+#include "lwsCallbacks.h"
 
 class lws_poller;
-
+class lws_timer_queue;
 class lws_event_loop{
 //单例模式
 public:
@@ -29,6 +30,10 @@ lws_event_loop();
 
 void loop();
 void quit();
+
+lws_timer_id run_at(const lws_time_stamp& time,const timer_call_back& call_back);
+lws_timer_id run_after(double delay,const timer_call_back& call_back);
+lws_timer_id run_every(double interval,const timer_call_back& call_back);
 
 void assert_in_loop_thread();
 bool in_loop_thread();
@@ -48,6 +53,8 @@ typedef std::vector<lws_channel*> channel_list;
 channel_list __active_channels;
 
 std::unique_ptr<lws_poller> __poller;
+
+lws_timer_queue* __timer_queue;
 
 };
 
