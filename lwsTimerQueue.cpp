@@ -83,8 +83,8 @@ lws_timer_queue::lws_timer_queue(lws_event_loop *loop)
     __timer_fd_channel.enable_reading();
 }
 //与eventloop共存亡，析构函数先不写
-lws_timer_queue::~lws_timer_queue(){
-
+lws_timer_queue::~lws_timer_queue()
+{
 }
 
 /*  处理读事件，首先得到当前的时间戳，然后把当前对应的fd信号读掉，让信号停止。
@@ -174,16 +174,25 @@ bool lws_timer_queue::insert(lws_timer *timer)
 }
 
 lws_timer_id lws_timer_queue::add_timer(const timer_call_back &call_back,
-                       lws_time_stamp when,
-                       double interval)
+                                        lws_time_stamp when,
+                                        double interval)
 {
-    lws_timer * timer = new lws_timer(call_back,when,interval);
+    lws_timer *timer = new lws_timer(call_back, when, interval);
+    __loop->run_in_loop(
+        std::bind(&lws_timer_queue::add_timer_in_loop,
+                  this,
+                  timer));
+
+    return lws_timer_id(timer);
+}
+
+void lws_timer_queue::add_timer_in_loop(lws_timer *timer)
+{
     __loop->assert_in_loop_thread();
     bool earliest_changed = insert(timer);
 
-    if(earliest_changed){
-        reset_timer_fd(__timer_fd,timer->expiration());
+    if (earliest_changed)
+    {
+        reset_timer_fd(__timer_fd, timer->expiration());
     }
-
-    return lws_timer_id(timer);
 }

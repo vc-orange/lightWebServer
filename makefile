@@ -1,10 +1,10 @@
-TEST = ./test/lwsTest03.cpp
+TEST = ./test/lwsTest06.cpp
 
 LIB_SRC = lwsChannel.o lwsEventLoop.o lwsPoller.o lwsTimer.o\
-	lwsTimerStamp.o lwsTimerQueue.o lwsTimerId.o
+	lwsTimerStamp.o lwsTimerQueue.o lwsTimerId.o lwsEventLoopThread.o
 LIB_H = lwsChannel.h lwsEventLoop.h lwsLog.h \
  lwsTimeStamp.h lwsTimerQueue.h lwsCallbacks.h lwsPoller.h \
- lwsTimer.h lwsTimerId.h
+ lwsTimer.h lwsTimerId.h lwsEventLoopThread.h
 CXXFALGS = -O0 -g -Wall  -I -pthread
 CLF = g++ -g -c #CXX LIB FALGS
 LDFLAGS = -lpthread
@@ -34,6 +34,9 @@ lwsTimerId.o :lwsTimerId.cpp $(LIB_H)
 
 lwsTimer.o :lwsTimer.cpp $(LIB_H)
 	$(CLF) lwsTimer.cpp -o lwsTimer.o
+
+lwsEventLoopThread.o :lwsEventLoopThread.cpp $(LIB_H)
+	$(CLF) lwsEventLoopThread.cpp -o lwsEventLoopThread.o
 
 clean:
 	-rm  *.o

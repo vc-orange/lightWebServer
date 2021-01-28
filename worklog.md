@@ -16,4 +16,8 @@
 eventloop拥有一个lws_timer_queue的指针，并在初始化时初始一个实体对象。
 每次调用eventloop的run_at功能会转为在lws_timer_queue中增加一个timer事件
 lws_timer_queue会在当前I/Oloop中注册一个channel，使得eventloop可以沿着lws_event_loop-->poll-->active_channel-->lws_channel-->lws_timer_queue-->timer-->call_back，以此来完成定时的callback任务。
+#
+增加了lwsEventLoopThread类，对eventloop做了一层包装，使得I/O线程不必是主线程。
+修改了eventloop类，增加了run_in_loop功能，使得所有相关调用会存入调用队列，以此保证I/O只在一个线程里完成
+
 

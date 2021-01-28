@@ -16,12 +16,11 @@ class lws_time_stamp;
 
 
 
-
 class lws_timer_queue{
 public:
     lws_timer_queue(lws_event_loop* loop);
     ~lws_timer_queue();
-
+    
     lws_timer_id add_timer(const timer_call_back& call_back,
                             lws_time_stamp when,
                             double interval);
@@ -31,6 +30,7 @@ private:
     typedef std::pair<lws_time_stamp,lws_timer*> entry;
     typedef std::set<entry> timer_list;
 
+    void add_timer_in_loop(lws_timer* timer);
     void handle_read();
 
     std::vector<entry> get_expired(lws_time_stamp now);
