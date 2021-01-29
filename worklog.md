@@ -19,5 +19,7 @@ lws_timer_queue会在当前I/Oloop中注册一个channel，使得eventloop可以
 #
 增加了lwsEventLoopThread类，对eventloop做了一层包装，使得I/O线程不必是主线程。
 修改了eventloop类，增加了run_in_loop功能，使得所有相关调用会存入调用队列，以此保证I/O只在一个线程里完成
-
+#
+增加了lwsSocket类，对socket进行了封装，保证socket关闭时自动close；
+增加了lwsAcceptor类，这个类把监听的fd挂在channel上，当有连接来的时候，loop会回调它的handle_read函数，生成一个新的连接并把新链接的fd传给注册好的“新链接处理函数”
 
