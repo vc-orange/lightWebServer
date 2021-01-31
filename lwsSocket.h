@@ -35,8 +35,9 @@ int __socket_fd;
 
 void make_server_addr(sockaddr* addr,uint16_t port);
 void make_addr(sockaddr* addr,const std::string& ip,uint16_t port);
-
-
+sockaddr get_sock_addr(int sock_fd);
+int get_port(const sockaddr *addr);
+void get_ip(const sockaddr *addr, char c[]);
 
 
 #endif

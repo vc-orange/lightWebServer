@@ -1,17 +1,17 @@
-TEST = ./test/lwsTest07.cpp
-TEST2 = ./test/lwsTest07_b.cpp
+TEST = ./test/lwsTest08.cpp
+TEST2 = 
 LIB_SRC = lwsChannel.o lwsEventLoop.o lwsPoller.o lwsTimer.o\
 	lwsTimerStamp.o lwsTimerQueue.o lwsTimerId.o lwsEventLoopThread.o\
-	lwsSocket.o lwsAcceptor.o
+	lwsSocket.o lwsAcceptor.o lwsTcpConnection.o lwsTcpServer.o
 LIB_H = lwsChannel.h lwsEventLoop.h lwsLog.h \
  lwsTimeStamp.h lwsTimerQueue.h lwsCallbacks.h lwsPoller.h \
  lwsTimer.h lwsTimerId.h lwsEventLoopThread.h\
- lwsSocket.h lwsAcceptor.h
+ lwsSocket.h lwsAcceptor.h lwsTcpConnection.h lwsTcpServer.h
 CXXFALGS = -O0 -g -Wall  -I -pthread
 CLF = g++ -g -c #CXX LIB FALGS
 LDFLAGS = -lpthread
 
-get: target target2
+get: target
 
 target: $(TEST) $(LIB_SRC)
 	g++  $(CXXFALGS) -o TEST.o $(TEST) $(LIB_SRC) $(LDFLAGS)
@@ -43,11 +43,17 @@ lwsTimer.o :lwsTimer.cpp $(LIB_H)
 lwsEventLoopThread.o :lwsEventLoopThread.cpp $(LIB_H)
 	$(CLF) lwsEventLoopThread.cpp -o lwsEventLoopThread.o
 
-lwsSocket.o :lwsSocket.cpp
+lwsSocket.o :lwsSocket.cpp $(LIB_H)
 	$(CLF) lwsSocket.cpp -o lwsSocket.o
 
-lwsAcceptor.o :lwsAcceptor.cpp
+lwsAcceptor.o :lwsAcceptor.cpp $(LIB_H)
 	$(CLF) lwsAcceptor.cpp -o lwsAcceptor.o
+
+lwsTcpConnection.o :lwsTcpConnection.cpp $(LIB_H)
+	$(CLF) lwsTcpConnection.cpp -o lwsTcpConnection.o
+
+lwsTcpServer.o :lwsTcpServer.cpp $(LIB_H)
+	$(CLF) lwsTcpServer.cpp -o lwsTcpServer.o
 
 clean:
 	-rm  *.o

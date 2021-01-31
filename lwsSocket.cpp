@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <fcntl.h>
+#include <string.h>
 lws_socket::lws_socket(int socket_fd)
     : __socket_fd(socket_fd)
 {
@@ -18,7 +19,9 @@ void lws_socket::close_socket_fd(int socket_fd)
 {
     if (socket_fd > 0)
     {
-        int ret = close(socket_fd);
+        int ret=shutdown(socket_fd,SHUT_RDWR);
+        assert(ret == 0);
+        ret = close(socket_fd);
         assert(ret == 0);
     }
 }
@@ -139,4 +142,31 @@ void make_addr(sockaddr* addr,const std::string& ip,uint16_t port)
     in->sin_family=AF_INET;
     in->sin_addr.s_addr=inet_addr(ip.c_str());
     in->sin_port=htons(port);
+}
+
+int get_port(const sockaddr *addr)
+{
+    sockaddr_in *addr_in = (sockaddr_in *)addr;
+    return ntohs(addr_in->sin_port);
+}
+
+
+void get_ip(const sockaddr *addr, char c[])
+{
+    sockaddr_in *addr_in = (sockaddr_in *)addr;
+    strcpy(c, inet_ntoa(addr_in->sin_addr));
+}
+
+sockaddr get_sock_addr(int sock_fd)
+{
+    sockaddr addr;
+    socklen_t addr_len=sizeof(addr);
+    memset(&addr,0,sizeof(addr));
+    int ret=getsockname(sock_fd,&addr,&addr_len);
+    if(ret<0)
+    {
+        LOG_ERROR<<"get_sock_addr()\n";
+        abort();
+    }
+    return addr;
 }
